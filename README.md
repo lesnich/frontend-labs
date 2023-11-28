@@ -24,4 +24,3 @@ Prerequisites: Node.js (^10.12.0, or >=12.0.0)
   npm run lint      // lint js files
   npm run stylelint // lint css files
 ```
-

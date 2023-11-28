@@ -3,3 +3,6 @@
 
 /* Reset and normalize */
 @import url('./normalize.css');
+@import url('../scss/style.scss');
+
+
