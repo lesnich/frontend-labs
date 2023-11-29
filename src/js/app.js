@@ -316,7 +316,7 @@ function showOnlyPhoto() {
   } else {
     onlyPhoto = false;
   }
-  showTop();
+  showFilterTop();
 }
 
 function cleanFilter() {
