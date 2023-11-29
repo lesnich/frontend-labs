@@ -1,21 +1,64 @@
 const testModules = require('./test-module');
-const data = require('./mockNormalize');
 const validation = require('./validation');
 const filter = require('./filter');
 const findObj = require('./findObj');
 const sort = require('./sort');
+const get = require('./get');
+const getPagination = require('./pagination');
+const post = require('./post');
 require('../css/app.css');
 
-let sortedData = data;
+let data;
+let sortedData;
+let filteredData;
 let isAsc = false;
 let ageCondition = false;
 let countryCondition = false;
 let genderCondition = false;
 let onlyFav = false;
 let onlyPhoto = false;
+let currentFav = 0;
+let currentTop = 0;
+
+function normalize(obj1) {
+  const arr = [];
+  const course = ['Mathematics', 'Physics', 'English', 'Computer Science', 'Dancing', 'Chess', 'Biology', 'Chemistry', 'Law', 'Art', 'Medicine', 'Statistics'];
+  const favorite = [true, false];
+  const color = ['red', 'pink', 'green', 'blue', 'yellow', 'purple', 'white', 'gray', 'black', 'lightblue', 'orange', 'rose', 'aqua'];
+  for (let i = 0; i < obj1.length; i += 1) {
+    let id = '';
+    for (let j = 0; j < 11; j += 1) {
+      id += Math.floor(Math.random() * 10);
+    }
+    const obj = {
+      id: `FN${id}`,
+      course: course[Math.floor(Math.random() * course.length)],
+      favorite: favorite[Math.floor(Math.random() * favorite.length)],
+      color: color[Math.floor(Math.random() * color.length)],
+      gender: obj1[i].gender,
+      title: obj1[i].name.title,
+      full_name: `${obj1[i].name.first} ${obj1[i].name.last}`,
+      city: obj1[i].location.city,
+      state: obj1[i].location.state,
+      country: obj1[i].location.country,
+      postcode: obj1[i].location.postcode,
+      coordinates: obj1[i].location.coordinates,
+      timezone: obj1[i].location.timezone,
+      email: obj1[i].email,
+      b_date: obj1[i].dob.date,
+      age: obj1[i].dob.age,
+      phone: obj1[i].phone,
+      picture_large: obj1[i].picture.large,
+      picture_thumbnail: obj1[i].picture.thumbnail,
+      note: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Odit dolorum dolorem sapiente. Pariatur aspernatur asperiores dignissimos! Rem ea explicabo ipsum numquam labore maiores voluptas. Fuga hic architecto accusamus eligendi voluptas!',
+    };
+    arr.push(obj);
+  }
+  return arr;
+}
 
 function showTop() {
-  const topContainer = document.querySelector('.top-container');
+  const starsContainer = document.querySelector('.stars-container');
   const stars = document.getElementsByClassName('star');
 
   for (let i = 0; i < 10; i += 1) {
@@ -39,22 +82,22 @@ function showTop() {
     if (lastNameText) lastname.textContent = lastNameText;
     div.appendChild(lastname);
 
-    const country = document.createElement('p');
-    country.classList.add('image-country');
-    country.textContent = data[i].country;
-    div.appendChild(country);
-
     const speciality = document.createElement('p');
     speciality.classList.add('image-speciality');
     speciality.textContent = data[i].course;
     div.appendChild(speciality);
+
+    const country = document.createElement('p');
+    country.classList.add('image-country');
+    country.textContent = data[i].country;
+    div.appendChild(country);
 
     const star = document.createElement('p');
     star.classList.add('star');
     star.textContent = '★';
     div.appendChild(star);
 
-    topContainer.appendChild(div);
+    starsContainer.appendChild(div);
 
     if (data[i].favorite) {
       stars[i].style.visibility = 'visible';
@@ -63,37 +106,37 @@ function showTop() {
 }
 
 function showFilterTop() {
-  let showArray = data;
+  filteredData = data;
   if (countryCondition) {
-    showArray = filter(showArray, countryCondition, null, null, null, null);
+    filteredData = filter(filteredData, countryCondition, null, null, null, null);
   }
   if (ageCondition) {
-    showArray = filter(showArray, null, ageCondition, null, null, null);
+    filteredData = filter(filteredData, null, ageCondition, null, null, null);
   }
   if (genderCondition) {
-    showArray = filter(showArray, null, null, genderCondition, null, null);
+    filteredData = filter(filteredData, null, null, genderCondition, null, null);
   }
   if (onlyFav) {
-    showArray = filter(showArray, null, null, null, null, true);
+    filteredData = filter(filteredData, null, null, null, null, true);
   }
   if (onlyPhoto) {
-    showArray = filter(showArray, null, null, null, true, null);
+    filteredData = filter(filteredData, null, null, null, true, null);
   }
   for (let i = 0; i < 10; i += 1) {
-    if (showArray.length > i) {
+    if (filteredData.length > i) {
       document.getElementsByClassName('starred')[i].style.visibility = 'visible';
-      document.getElementsByClassName('image-large')[i].src = showArray[i].picture_large;
-      const firstName = showArray[i].full_name.split(' ')[0];
-      const lastName = showArray[i].full_name.split(' ')[1];
+      document.getElementsByClassName('image-large')[i].src = filteredData[i].picture_large;
+      const firstName = filteredData[i].full_name.split(' ')[0];
+      const lastName = filteredData[i].full_name.split(' ')[1];
       document.getElementsByClassName('image-name')[i].innerHTML = firstName;
       if (lastName) {
         document.getElementsByClassName('image-lastname')[i].innerHTML = lastName;
       } else {
         document.getElementsByClassName('image-lastname')[i].innerHTML = ' ';
       }
-      document.getElementsByClassName('image-speciality')[i].innerHTML = showArray[i].course;
-      document.getElementsByClassName('image-country')[i].innerHTML = showArray[i].country;
-      if (showArray[i].favorite) {
+      document.getElementsByClassName('image-speciality')[i].innerHTML = filteredData[i].course;
+      document.getElementsByClassName('image-country')[i].innerHTML = filteredData[i].country;
+      if (filteredData[i].favorite) {
         document.getElementsByClassName('star')[i].style.visibility = 'visible';
       } else {
         document.getElementsByClassName('star')[i].style.visibility = 'hidden';
@@ -133,9 +176,31 @@ function showTable() {
   }
 }
 
+function showNewTable() {
+  for (let i = 0; i < 10; i += 1) {
+    if (data[i]) {
+      document.getElementsByClassName('table-name')[i].innerText = data[i].full_name;
+      document.getElementsByClassName('table-course')[i].innerText = data[i].course;
+      if (data[i].age) {
+        document.getElementsByClassName('table-age')[i].innerText = data[i].age;
+      } else {
+        document.getElementsByClassName('table-age')[i].innerText = ' ';
+      }
+      document.getElementsByClassName('table-gender')[i].innerText = data[i].gender;
+      document.getElementsByClassName('table-country')[i].innerText = data[i].country;
+    } else {
+      document.getElementsByClassName('table-name')[i].innerText = '';
+      document.getElementsByClassName('table-course')[i].innerText = '';
+      document.getElementsByClassName('table-age')[i].innerText = ' ';
+      document.getElementsByClassName('table-gender')[i].innerText = '';
+      document.getElementsByClassName('table-country')[i].innerText = '';
+    }
+  }
+}
+
 function showFav() {
   const fav = data.filter((obj) => obj.favorite);
-  const next = document.getElementById('next');
+  const next = document.getElementById('next2');
   for (let i = 0; i < 5; i += 1) {
     const div = document.createElement('div');
     div.classList.add('favorites');
@@ -311,12 +376,12 @@ function showOnlyFav() {
 }
 
 function showOnlyPhoto() {
-  if (!onlyFav) {
+  if (!onlyPhoto) {
     onlyPhoto = true;
   } else {
     onlyPhoto = false;
   }
-  showTop();
+  showFilterTop();
 }
 
 function cleanFilter() {
@@ -328,7 +393,7 @@ function cleanFilter() {
   genderCondition = false;
   onlyFav = false;
   onlyPhoto = false;
-  sortedData = data;
+  filteredData = data;
 }
 
 function addTeacher() {
@@ -351,15 +416,147 @@ function addTeacher() {
     data.unshift(obj);
     cleanFilter();
     showFilterTop();
-  } else {
-    alert('Your data is not valid.');
+    showNewTable();
+    post(obj).then((response) => {
+      console.log(response);
+    });
   }
 }
 
+function paginationTop(index) {
+  const changedCurrentTop = currentTop + index;
+  if (changedCurrentTop > -1 && changedCurrentTop < filteredData.length) {
+    currentTop = changedCurrentTop;
+    for (let i = 0; i < 10; i += 1) {
+      if ((currentTop + i) < filteredData.length) {
+        document.getElementsByClassName('starred')[i].style.visibility = 'visible';
+        document.getElementsByClassName('image-large')[i].src = filteredData[currentTop + i].picture_large;
+        const firstName = filteredData[currentTop + i].full_name.split(' ')[0];
+        const lastName = filteredData[currentTop + i].full_name.split(' ')[1];
+        document.getElementsByClassName('image-name')[i].innerHTML = firstName;
+        if (lastName) {
+          document.getElementsByClassName('image-lastname')[i].innerHTML = lastName;
+        } else {
+          document.getElementsByClassName('image-lastname')[i].innerHTML = ' ';
+        }
+        document.getElementsByClassName('image-speciality')[i].innerHTML = filteredData[currentTop + i].course;
+        document.getElementsByClassName('image-country')[i].innerHTML = filteredData[currentTop + i].country;
+        if (filteredData[currentTop + i].favorite) {
+          document.getElementsByClassName('star')[i].style.visibility = 'visible';
+        } else {
+          document.getElementsByClassName('star')[i].style.visibility = 'hidden';
+        }
+      } else {
+        document.getElementsByClassName('starred')[i].style.visibility = 'hidden';
+        document.getElementsByClassName('star')[i].style.visibility = 'hidden';
+      }
+    }
+  }
+}
+
+function paginationFav(index) {
+  const fav = data.filter((obj) => obj.favorite);
+  currentFav += index;
+  if (currentFav === -1) {
+    currentFav = fav.length;
+  }
+  for (let i = 0; i < 5; i += 1) {
+    document.getElementsByClassName('image-large')[i + 10].src = fav[(currentFav + i) % fav.length].picture_large;
+    const firstName = fav[(currentFav + i) % fav.length].full_name.split(' ')[0];
+    const lastName = fav[(currentFav + i) % fav.length].full_name.split(' ')[1];
+    document.getElementsByClassName('image-name')[i + 10].innerText = firstName;
+    if (lastName) {
+      document.getElementsByClassName('image-lastname')[i + 10].innerText = lastName;
+    } else {
+      document.getElementsByClassName('image-lastname')[i + 10].innerText = ' ';
+    }
+    document.getElementsByClassName('image-speciality')[i + 10].innerText = fav[(currentFav + i) % fav.length].course;
+    document.getElementsByClassName('image-country')[i + 10].innerText = fav[(currentFav + i) % fav.length].country;
+  }
+}
+
+function paginationTable(index) {
+  for (let i = 0; i < 10; i += 1) {
+    if ((index + i) < data.length) {
+      document.getElementsByClassName('table-name')[i].innerText = sortedData[index + i].full_name;
+      document.getElementsByClassName('table-course')[i].innerText = sortedData[index + i].course;
+      if (data[i].age) {
+        document.getElementsByClassName('table-age')[i].innerText = sortedData[index + i].age;
+      } else {
+        document.getElementsByClassName('table-age')[i].innerText = ' ';
+      }
+      document.getElementsByClassName('table-gender')[i].innerText = sortedData[index + i].gender;
+      document.getElementsByClassName('table-country')[i].innerText = sortedData[index + i].country;
+    } else {
+      document.getElementsByClassName('table-name')[i].style.visibility = 'hidden';
+      document.getElementsByClassName('table-course')[i].style.visibility = 'hidden';
+      document.getElementsByClassName('table-age')[i].style.visibility = 'hidden';
+      document.getElementsByClassName('table-gender')[i].style.visibility = 'hidden';
+      document.getElementsByClassName('table-country')[i].style.visibility = 'hidden';
+    }
+  }
+}
+
+function pagination(index) {
+  getPagination(index).then((response) => {
+    const responseData = normalize(response);
+    for (let i = 0; i < 10; i += 1) {
+      document.getElementsByClassName('table-name')[i].innerText = responseData[i].full_name;
+      document.getElementsByClassName('table-course')[i].innerText = responseData[i].course;
+      if (responseData[i].age) {
+        document.getElementsByClassName('table-age')[i].innerText = responseData[i].age;
+      } else {
+        document.getElementsByClassName('table-age')[i].innerText = ' ';
+      }
+      document.getElementsByClassName('table-gender')[i].innerText = responseData[i].gender;
+      document.getElementsByClassName('table-country')[i].innerText = responseData[i].country;
+    }
+  });
+}
+function setCountries(users) {
+  const uniqueCountries = [];
+  users.forEach((user) => {
+    if (!uniqueCountries.includes(user.country)) {
+      uniqueCountries.push(user.country);
+    }
+    uniqueCountries.sort();
+  });
+
+  const selectElement1 = document.getElementById('filter-country');
+  const selectElement2 = document.getElementById('addCountry');
+  selectElement1.innerHTML = '';
+  selectElement2.innerHTML = '';
+
+  const allOption = document.createElement('option');
+  allOption.value = 'all';
+  allOption.textContent = 'All';
+  selectElement1.appendChild(allOption);
+
+  uniqueCountries.forEach((country) => {
+    const option1 = document.createElement('option');
+    const option2 = document.createElement('option');
+    option1.value = country;
+    option2.textContent = country;
+    option2.value = country;
+    option1.textContent = country;
+    selectElement1.appendChild(option1);
+    selectElement2.appendChild(option2);
+  });
+}
+
 console.log(testModules.hello);
-showTop(data);
-showTable();
-showFav();
+get.then((response) => {
+  data = normalize(response);
+  sortedData = data;
+  filteredData = data;
+  setCountries(data);
+  showTop();
+  showTable();
+  showFav();
+  for (let i = 0; i < 15; i += 1) {
+    document.getElementsByClassName('image-large')[i].addEventListener('click', () => openInfoPopup(`${document.getElementsByClassName('image-name')[i].textContent} ${document.getElementsByClassName('image-lastname')[i].textContent}`));
+  }
+});
 
 document.getElementById('search').addEventListener('click', search);
 
@@ -391,6 +588,17 @@ document.getElementById('closeAddPopup').addEventListener('click', () => {
 document.getElementById('closeInfoPopup').addEventListener('click', () => {
   document.getElementsByClassName('info-popup')[0].style.visibility = 'hidden';
 });
+
+document.getElementById('next1').addEventListener('click', () => paginationTop(10));
+document.getElementById('prev1').addEventListener('click', () => paginationTop(-10));
+
+document.getElementById('next2').addEventListener('click', () => paginationFav(1));
+document.getElementById('prev2').addEventListener('click', () => paginationFav(-1));
+
+document.getElementById('page1').addEventListener('click', () => paginationTable(0));
+document.getElementById('page2').addEventListener('click', () => paginationTable(10));
+document.getElementById('page3').addEventListener('click', () => paginationTable(20));
+document.getElementById('page-last').addEventListener('click', () => paginationTable(Math.floor(data.length / 10) * 10));
 
 for (let i = 0; i < 15; i += 1) {
   document.getElementsByClassName('image-large')[i].addEventListener('click', () => openInfoPopup(`${document.getElementsByClassName('image-name')[i].textContent} ${document.getElementsByClassName('image-lastname')[i].textContent}`));

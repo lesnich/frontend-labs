@@ -323,7 +323,29 @@ tr:nth-child(even) {
   }
 }
 
-#prev, #next {
+.top-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px; /* проміжок між елементами */
+}
+
+#prev1,
+#next1 {
+  cursor: pointer;
+  font-size: 80px;
+  color: #a3a3a3;
+}
+
+.stars-container {
+  display: flex;
+  flex-wrap: wrap; /* рядки будуть автоматично формуватися */
+  justify-content: space-around; /* розташування блоків starred в два рядки */
+  align-items: center;
+  flex: 1; /* стрілки займають постійний простір, щоб залишити місце для рядків starred */
+}
+
+#prev2, #next2 {
   cursor: pointer;
   font-size: 80px;
   color:#a3a3a3;
@@ -331,7 +353,7 @@ tr:nth-child(even) {
   margin-bottom: auto;
 }
 
-#prev:hover, #next:hover {
+#prev1:hover, #next1:hover, #prev2:hover, #next2:hover {
   color:#5f5f5f;
 }
 

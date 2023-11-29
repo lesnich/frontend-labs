@@ -3,6 +3,7 @@ const additionalUsers = require('../mocks/additional');
 
 function color() {
   const sybmols = '0123456789abcdef';
+  // eslint-disable-next-line no-shadow
   let color = '#';
   for (let i = 0; i < 6; i += 1) {
     color += sybmols[Math.floor(Math.random() * sybmols.length)];

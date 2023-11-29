@@ -1,3 +1,4 @@
+/* eslint-disable linebreak-style */
 module.exports = (arr, country, age, gender, photo, favorite) => {
   const newArr = arr.filter((user) => {
     if (country && user.country !== country) {
@@ -12,7 +13,7 @@ module.exports = (arr, country, age, gender, photo, favorite) => {
     if (typeof photo === 'boolean' && photo && (user.picture_large !== '../images/user.png') !== photo) {
       return false;
     }
-    if (age && user.age !== age) {
+    if (age && !(user.age.toString() >= age.split('-')[0].toString() && user.age.toString() <= age.split('-')[1].toString())) {
       return false;
     }
     return true;
