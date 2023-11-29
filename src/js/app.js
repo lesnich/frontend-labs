@@ -4,8 +4,6 @@ const filter = require('./filter');
 const findObj = require('./findObj');
 const sort = require('./sort');
 const get = require('./get');
-const getPagination = require('./pagination');
-const post = require('./post');
 require('../css/app.css');
 
 let data;
