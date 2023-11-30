@@ -1,3 +1,4 @@
+/* eslint-disable linebreak-style */
 const _ = require('lodash');
 const dayjs = require('dayjs');
 const testModules = require('./test-module');
