@@ -10,7 +10,7 @@ module.exports = (arr, value) => {
       || firstName === _.trim(value)
       || lastName === _.trim(value)
       || obj.note === _.trim(value)
-      || (!_.isUndefined(obj.age) && obj.age.toString() === _.trim(value))
+      || obj.age.toString() === _.trim(value)
     );
   };
 

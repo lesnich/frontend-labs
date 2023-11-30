@@ -1,5 +1,7 @@
+const filter = require('./filter');
+
 module.exports = (arr, value) => {
-  const condition = (obj) => obj.age > Number(value.split('-')[0]) && obj.age < Number(value.split('-')[1]);
-  const matchObj = arr.filter((obj) => condition(obj));
-  return Math.round((matchObj.length / arr.length) * 100);
+  const data = filter(arr, null, value, null, null, null);
+  const percentage = ((data.length / arr.length) * 100).toFixed(2);
+  return percentage;
 };

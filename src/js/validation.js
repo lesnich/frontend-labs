@@ -1,5 +1,7 @@
+const _ = require('lodash');
+
 function checkString(str) {
-  return typeof str === 'string' && str.charAt(0).toUpperCase() === str.charAt(0);
+  return typeof str === 'string' && _.upperFirst(str) === str;
 }
 
 module.exports = (user) => {
@@ -8,7 +10,7 @@ module.exports = (user) => {
   }
   if (typeof (user.gender) !== 'string') return false;
 
-  if (typeof user.age !== 'number' || (user.age > 100 || user.age < 17)) return false;
+  if (typeof user.age !== 'number' || !(_.inRange(user.age, 17, 100))) return false;
 
   if (!user.email.includes('@')) return false;
 
