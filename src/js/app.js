@@ -415,9 +415,8 @@ function addTeacher() {
     cleanFilter();
     showFilterTop();
     showNewTable();
-    post(obj).then((response) => {
-      console.log(response);
-    });
+  } else {
+    alert('Your data is not valid.');
   }
 }
 
