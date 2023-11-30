@@ -1,11 +1,10 @@
+/* eslint-disable linebreak-style */
 const testModules = require('./test-module');
 const validation = require('./validation');
 const filter = require('./filter');
 const findObj = require('./findObj');
 const sort = require('./sort');
 const get = require('./get');
-const getPagination = require('./pagination');
-const post = require('./post');
 require('../css/app.css');
 
 let data;
@@ -497,22 +496,6 @@ function paginationTable(index) {
   }
 }
 
-function pagination(index) {
-  getPagination(index).then((response) => {
-    const responseData = normalize(response);
-    for (let i = 0; i < 10; i += 1) {
-      document.getElementsByClassName('table-name')[i].innerText = responseData[i].full_name;
-      document.getElementsByClassName('table-course')[i].innerText = responseData[i].course;
-      if (responseData[i].age) {
-        document.getElementsByClassName('table-age')[i].innerText = responseData[i].age;
-      } else {
-        document.getElementsByClassName('table-age')[i].innerText = ' ';
-      }
-      document.getElementsByClassName('table-gender')[i].innerText = responseData[i].gender;
-      document.getElementsByClassName('table-country')[i].innerText = responseData[i].country;
-    }
-  });
-}
 function setCountries(users) {
   const uniqueCountries = [];
   users.forEach((user) => {
